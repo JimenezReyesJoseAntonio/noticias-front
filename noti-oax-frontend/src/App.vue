@@ -4,7 +4,9 @@
       <router-link to="/" class="navbar__logo">Noti-Oax</router-link>
       <nav class="navbar__links">
         <router-link to="/" class="navbar__link">Inicio</router-link>
-        <router-link to="/login" class="navbar__link">Login</router-link>
+        <router-link v-if="!logueado" to="/login" class="navbar__link">Login</router-link>
+        
+        <button v-else @click="cerrarSesion" class="navbar__link navbar__link--boton">Cerrar sesión</button>
       </nav>
     </header>
 
@@ -17,12 +19,33 @@
   </div>
 </template>
 
+<script setup>
+import { ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+
+const logueado = ref(!!localStorage.getItem('token'))
+const route = useRoute()
+const router = useRouter()
+
+// Cada que cambias de página, revisa si hay token
+watch(() => route.path, () => {
+  logueado.value = !!localStorage.getItem('token')
+})
+
+function cerrarSesion() {
+  localStorage.removeItem('token')
+  logueado.value = false
+  router.push('/login')
+}
+</script>
+
+
 <style>
 .navbar { background: var(--color-primario); padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
 .navbar__logo { color: var(--color-blanco); text-decoration: none; font-weight: bold; font-size: 22px; }
-.navbar__links { display: flex; gap: 16px; }
-.navbar__link { color: var(--color-fondo); text-decoration: none; }
+.navbar__links { display: flex; gap: 16px; align-items: center; }
+.navbar__link { color: var(--color-fondo); text-decoration: none; background: none; border: none; cursor: pointer; font-size: 15px; }
 .navbar__link:hover { color: var(--color-verde-claro); }
+.navbar__link--boton { font-family: inherit; }
 .footer { background: var(--color-primario); color: var(--color-fondo); padding: 24px; text-align: center; margin-top: 40px; }
-.footer__texto { font-size: 14px; margin: 4px 0; }
 </style>
