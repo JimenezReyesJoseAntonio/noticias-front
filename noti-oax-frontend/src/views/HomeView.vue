@@ -1,6 +1,5 @@
 <template>
   <main class="home">
- 
     <section class="hero">
       <h1 class="hero__titulo">Las noticias de Oaxaca, en un solo lugar</h1>
       <p class="hero__texto">Información local, cultura y comunidad.</p>
@@ -15,12 +14,24 @@
 
     <section class="noticias">
       <h2 class="noticias__titulo">Últimas noticias</h2>
+
+      <div class="filtros">
+        <button
+          v-for="cat in categorias"
+          :key="cat"
+          @click="categoriaActiva = cat"
+          :class="['filtro__btn', { 'filtro__btn--activo': categoriaActiva === cat }]"
+        >{{ cat }}</button>
+      </div>
+
       <p v-if="cargando" class="noticias__cargando">Cargando...</p>
+      <p v-else-if="noticiasFiltradas.length === 0">No hay noticias en esta categoría.</p>
+
       <div class="noticias__lista">
-        <article v-for="n in noticias" :key="n.id" class="noticia">
+        <article v-for="n in noticiasFiltradas" :key="n.id_noticia || n.id" class="noticia">
           <div class="noticia__imagen"></div>
           <h3 class="noticia__titulo">{{ n.titulo }}</h3>
-          <p class="noticia__meta">{{ n.categoria }} • {{ n.autor }}</p>
+          <p class="noticia__meta">{{ n.nombre_categoria || n.categoria }} • {{ n.autor }}</p>
           <p class="noticia__resumen">{{ n.resumen }}</p>
           <router-link :to="`/noticia/${n.id_noticia || n.id}`" class="noticia__link">Leer más →</router-link>
         </article>
@@ -43,13 +54,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import api from '../services/api'
+
 const noticias = ref([])
 const cargando = ref(true)
+const categoriaActiva = ref('Todas')
+const categorias = ref(['Todas'])
+
 onMounted(async () => {
-  try { const res = await api.get('/noticias'); noticias.value = res.data }
-  finally { cargando.value = false }
+  try {
+    const res = await api.get('/noticias')
+    noticias.value = res.data
+    const nombres = [...new Set(noticias.value.map(n => n.nombre_categoria).filter(Boolean))]
+    categorias.value = ['Todas', ...nombres]
+  } catch (e) {
+    console.log('Error home', e)
+  } finally {
+    cargando.value = false
+  }
+})
+
+const noticiasFiltradas = computed(() => {
+  if (categoriaActiva.value === 'Todas') return noticias.value
+  return noticias.value.filter(n => n.nombre_categoria === categoriaActiva.value)
 })
 </script>
 
@@ -65,13 +93,16 @@ onMounted(async () => {
 
 .noticias { max-width: 900px; margin: 0 auto; padding: 24px; }
 .noticias__titulo { color: var(--color-primario); margin-bottom: 16px; }
+.filtros { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 20px; }
+.filtro__btn { padding: 8px 16px; border: 1px solid var(--color-primario); background: white; color: var(--color-primario); border-radius: 20px; cursor: pointer; font-weight: bold; }
+.filtro__btn--activo { background: var(--color-primario); color: white; }
 .noticias__lista { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .noticia { background: var(--color-blanco); border-radius: 8px; overflow: hidden; padding-bottom: 12px; }
 .noticia__imagen { height: 120px; background: var(--color-primario); }
 .noticia__titulo { padding: 12px 12px 0; color: var(--color-primario); font-size: 17px; }
 .noticia__meta { padding: 6px 12px; font-size: 12px; color: #666; }
 .noticia__resumen { padding: 0 12px 8px; font-size: 14px; }
-.noticia__link { padding: 0 12px; color: var(--color-verde-oscuro); font-weight: bold; font-size: 14px; cursor: pointer; }
+.noticia__link { padding: 0 12px; color: var(--color-verde-oscuro); font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: none; }
 
 .destacados { max-width: 900px; margin: 0 auto; padding: 0 24px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .destacados__item { height: 80px; border-radius: 8px; }
