@@ -29,7 +29,8 @@
 
       <div class="noticias__lista">
         <article v-for="n in noticiasFiltradas" :key="n.id_noticia || n.id" class="noticia">
-          <div class="noticia__imagen"></div>
+          <img v-if="n.imagen" :src="getUrlImagen(n.imagen)" class="noticia__imagen" alt="" />
+          <div v-else class="noticia__imagen"></div>
           <h3 class="noticia__titulo">{{ n.titulo }}</h3>
           <p class="noticia__meta">{{ n.nombre_categoria || n.categoria }} • {{ n.autor }}</p>
           <p class="noticia__resumen">{{ n.resumen }}</p>
@@ -78,7 +79,14 @@ onMounted(async () => {
 const noticiasFiltradas = computed(() => {
   if (categoriaActiva.value === 'Todas') return noticias.value
   return noticias.value.filter(n => n.nombre_categoria === categoriaActiva.value)
-})
+});
+
+const getUrlImagen = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `http://localhost:3000${url}`
+}
+
 </script>
 
 <style scoped>
@@ -98,7 +106,7 @@ const noticiasFiltradas = computed(() => {
 .filtro__btn--activo { background: var(--color-primario); color: white; }
 .noticias__lista { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .noticia { background: var(--color-blanco); border-radius: 8px; overflow: hidden; padding-bottom: 12px; }
-.noticia__imagen { height: 120px; background: var(--color-primario); }
+.noticia__imagen { height: 120px; width: 100%; object-fit: cover; background: var(--color-primario); display: block; }
 .noticia__titulo { padding: 12px 12px 0; color: var(--color-primario); font-size: 17px; }
 .noticia__meta { padding: 6px 12px; font-size: 12px; color: #666; }
 .noticia__resumen { padding: 0 12px 8px; font-size: 14px; }

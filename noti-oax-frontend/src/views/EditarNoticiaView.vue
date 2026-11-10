@@ -3,6 +3,11 @@
     <section class="crear__tarjeta">
       <h1 class="crear__titulo">Editar noticia</h1>
       <form class="crear__form" @submit.prevent="guardar">
+        <label>Imagen actual</label>
+        <img v-if="form.imagen" :src="getUrlImagen(form.imagen)" style="width:100%; max-height:200px; object-fit:cover; border-radius:8px;" />
+        <label>Cambiar imagen</label>
+        <input type="file" accept="image/*" @change="subirImagen" />
+        <p v-if="subiendo">Subiendo...</p>
         <label class="crear__label">Título</label>
         <input v-model="form.titulo" class="crear__input" required />
         <label class="crear__label">Resumen</label>
@@ -24,17 +29,42 @@ import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 
-const form = ref({ titulo: '', resumen: '', contenido: '', id_categoria: 1, destacada: false })
+const form = ref({ titulo:'', resumen:'', contenido:'', imagen:'', id_categoria:'' })
 const mensaje = ref('')
 const route = useRoute()
 const router = useRouter()
+const subiendo = ref(false)
+
+const getUrlImagen = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `http://localhost:3000${url}`
+}
 
 onMounted(async () => {
   const res = await api.get('/noticias')
   const lista = res.data.noticias || res.data
   const n = lista.find(x => String(x.id_noticia || x.id) === String(route.params.id))
-  if (n) form.value = { titulo: n.titulo, resumen: n.resumen, contenido: n.contenido, id_categoria: n.id_categoria, destacada: !!n.destacada }
+  if (n) form.value = { titulo: n.titulo, resumen: n.resumen, contenido: n.contenido, imagen: n.imagen || '', id_categoria: n.id_categoria, destacada: !!n.destacada }
 })
+
+async function subirImagen(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  const formData = new FormData()
+  formData.append('imagen', file)
+  subiendo.value = true
+  try {
+    const res = await api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    form.value.imagen = res.data.url
+  } catch (err) {
+    alert('Error al subir imagen')
+  } finally {
+    subiendo.value = false
+  }
+}
 
 async function guardar() {
   await api.put(`/noticias/${route.params.id}`, form.value)

@@ -3,6 +3,11 @@
     <section class="crear__tarjeta">
       <h1 class="crear__titulo">Crear noticia</h1>
       <form class="crear__form" @submit.prevent="crear">
+        <label>Imagen</label>
+        <input type="file" accept="image/*" @change="subirImagen" />
+        <img v-if="form.imagen" :src="getUrlImagen(form.imagen)" style="width:100%; max-height:200px; object-fit:cover; margin-top:8px; border-radius:8px;" />
+        <p v-if="subiendo">Subiendo...</p>
+
         <label class="crear__label">Título</label>
         <input v-model="form.titulo" class="crear__input" required />
 
@@ -35,6 +40,32 @@ const form = ref({ titulo: '', resumen: '', contenido: '', id_categoria: 1, dest
 const mensaje = ref('')
 const error = ref('')
 const router = useRouter()
+const subiendo = ref(false)
+
+const getUrlImagen = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `http://localhost:3000${url}`
+}
+
+async function subirImagen(e) {
+  const file = e.target.files[0]
+  if (!file) return
+  const formData = new FormData()
+  formData.append('imagen', file)
+  subiendo.value = true
+  try {
+    const res = await api.post('/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    })
+    form.value.imagen = res.data.url 
+  } catch (err) {
+    alert('Error al subir imagen')
+    console.log(err)
+  } finally {
+    subiendo.value = false
+  }
+}
 
 async function crear() {
   try {

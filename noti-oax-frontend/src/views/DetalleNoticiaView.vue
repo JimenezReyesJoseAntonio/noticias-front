@@ -2,7 +2,8 @@
   <main class="detalle" v-if="noticia">
     <h1 class="detalle__titulo">{{ noticia.titulo }}</h1>
     <p class="detalle__meta">{{ noticia.categoria }} • {{ noticia.autor }}</p>
-    <div class="detalle__imagen"></div>
+    <img v-if="noticia.imagen" :src="getUrlImagen(noticia.imagen)" class="detalle__imagen" alt="" />
+    <div v-else class="detalle__imagen"></div>
     <p class="detalle__resumen">{{ noticia.resumen }}</p>
     <p class="detalle__contenido">{{ noticia.contenido }}</p>
     <div v-if="logueado" class="detalle__acciones">
@@ -23,6 +24,12 @@ const noticia = ref(null)
 const route = useRoute()
 const router = useRouter()
 const logueado = ref(!!localStorage.getItem('token'))
+
+const getUrlImagen = (url) => {
+  if (!url) return ''
+  if (url.startsWith('http')) return url
+  return `http://localhost:3000${url}`
+}
 
 onMounted(async () => {
   try {
@@ -45,7 +52,7 @@ async function eliminar() {
 .detalle { max-width: 700px; margin: 0 auto; padding: 32px 24px; background: var(--color-blanco); margin-top: 24px; border-radius: 12px; }
 .detalle__titulo { color: var(--color-primario); font-size: 28px; }
 .detalle__meta { color: #666; font-size: 13px; margin: 8px 0 16px; }
-.detalle__imagen { height: 200px; background: var(--color-primario); border-radius: 8px; margin-bottom: 16px; }
+.detalle__imagen { width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; display: block; background: var(--color-primario); }
 .detalle__resumen { font-weight: bold; color: var(--color-verde-oscuro); margin-bottom: 12px; }
 .detalle__contenido { line-height: 1.6; color: #333; }
 .detalle__acciones { display: flex; gap: 12px; margin-top: 20px; }
