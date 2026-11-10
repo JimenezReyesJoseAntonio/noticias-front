@@ -3,12 +3,14 @@ import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import CrearNoticiaView from '../views/CrearNoticiaView.vue'
 import DetalleNoticiaView from '../views/DetalleNoticiaView.vue'
+import EditarNoticiaView from '../views/EditarNoticiaView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/login', component: LoginView },
   { path: '/crear', component: CrearNoticiaView, meta: { requiereAuth: true } },
-  { path: '/noticia/:id', component: DetalleNoticiaView }
+  { path: '/noticia/:id', component: DetalleNoticiaView },
+  { path: '/editar/:id', component: EditarNoticiaView, meta: { requiereAuth: true } }
 ]
 
 const router = createRouter({ history: createWebHistory(), routes })

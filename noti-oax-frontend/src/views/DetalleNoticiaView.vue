@@ -5,6 +5,10 @@
     <div class="detalle__imagen"></div>
     <p class="detalle__resumen">{{ noticia.resumen }}</p>
     <p class="detalle__contenido">{{ noticia.contenido }}</p>
+    <div v-if="logueado" class="detalle__acciones">
+      <router-link :to="`/editar/${route.params.id}`" class="detalle__btn detalle__btn--editar">Editar</router-link>
+      <button @click="eliminar" class="detalle__btn detalle__btn--eliminar">Eliminar</button>
+    </div>
     <router-link to="/" class="detalle__volver">← Volver</router-link>
   </main>
   <p v-else class="detalle__cargando">Cargando...</p>
@@ -12,11 +16,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
 
 const noticia = ref(null)
 const route = useRoute()
+const router = useRouter()
+const logueado = ref(!!localStorage.getItem('token'))
 
 onMounted(async () => {
   try {
@@ -27,6 +33,12 @@ onMounted(async () => {
     console.log('Error detalle', e)
   }
 })
+
+async function eliminar() {
+  if (!confirm('¿Borrar esta noticia?')) return
+  await api.delete(`/noticias/${route.params.id}`)
+  router.push('/')
+}
 </script>
 
 <style scoped>
@@ -36,6 +48,10 @@ onMounted(async () => {
 .detalle__imagen { height: 200px; background: var(--color-primario); border-radius: 8px; margin-bottom: 16px; }
 .detalle__resumen { font-weight: bold; color: var(--color-verde-oscuro); margin-bottom: 12px; }
 .detalle__contenido { line-height: 1.6; color: #333; }
+.detalle__acciones { display: flex; gap: 12px; margin-top: 20px; }
+.detalle__btn { padding: 10px 16px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; text-decoration: none; font-size: 14px; }
+.detalle__btn--editar { background: var(--color-verde-oscuro); color: white; }
+.detalle__btn--eliminar { background: #c0392b; color: white; }
 .detalle__volver { display: inline-block; margin-top: 24px; color: var(--color-verde-oscuro); font-weight: bold; text-decoration: none; }
 .detalle__cargando { text-align: center; padding: 40px; }
 </style>
