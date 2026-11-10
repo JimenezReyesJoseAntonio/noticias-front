@@ -5,8 +5,8 @@
       <nav class="navbar__links">
         <router-link to="/" class="navbar__link">Inicio</router-link>
         <router-link v-if="!logueado" to="/login" class="navbar__link">Login</router-link>
-        
         <button v-else @click="cerrarSesion" class="navbar__link navbar__link--boton">Cerrar sesión</button>
+        <router-link v-if="logueado" to="/crear" class="navbar__link">Crear noticia</router-link>
       </nav>
     </header>
 
