@@ -22,7 +22,7 @@
           <h3 class="noticia__titulo">{{ n.titulo }}</h3>
           <p class="noticia__meta">{{ n.categoria }} • {{ n.autor }}</p>
           <p class="noticia__resumen">{{ n.resumen }}</p>
-          <a class="noticia__link">Leer más →</a>
+          <router-link :to="`/noticia/${n.id_noticia || n.id}`" class="noticia__link">Leer más →</router-link>
         </article>
       </div>
     </section>
