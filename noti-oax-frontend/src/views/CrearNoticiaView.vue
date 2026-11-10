@@ -17,8 +17,13 @@
         <label class="crear__label">Contenido</label>
         <textarea v-model="form.contenido" class="crear__input crear__input--area" rows="5" required></textarea>
 
-        <label class="crear__label">Categoría (ID)</label>
-        <input v-model.number="form.id_categoria" type="number" class="crear__input" required />
+        <label class="crear__label">Categoría</label>
+        <select v-model="form.id_categoria" class="crear__input" required>
+         <option value="" disabled>Selecciona una categoría</option>
+         <option v-for="cat in categorias" :key="cat.id" :value="cat.id">
+         {{ cat.nombre }}
+         </option>
+        </select>
 
         <label class="crear__check"><input type="checkbox" v-model="form.destacada" /> Destacada</label>
 
@@ -36,6 +41,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
 
+const categorias = ref([
+  { id: 1, nombre: 'Local' },
+  { id: 2, nombre: 'Cultura' },
+  { id: 3, nombre: 'Turismo' }
+])
 const form = ref({ titulo: '', resumen: '', contenido: '', id_categoria: 1, destacada: false })
 const mensaje = ref('')
 const error = ref('')

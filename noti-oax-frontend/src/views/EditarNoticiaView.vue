@@ -14,8 +14,13 @@
         <input v-model="form.resumen" class="crear__input" required />
         <label class="crear__label">Contenido</label>
         <textarea v-model="form.contenido" class="crear__input crear__input--area" rows="5" required></textarea>
-        <label class="crear__label">Categoría (ID)</label>
-        <input v-model.number="form.id_categoria" type="number" class="crear__input" required />
+        <label class="crear__label">Categoría</label>
+        <select v-model="form.id_categoria" class="crear__input" required>
+         <option value="" disabled>Selecciona una categoría</option>
+         <option v-for="cat in categorias" :key="cat.id" :value="cat.id">
+         {{ cat.nombre }}
+         </option>
+        </select>
         <label class="crear__check"><input type="checkbox" v-model="form.destacada" /> Destacada</label>
         <p v-if="mensaje" class="crear__exito">{{ mensaje }}</p>
         <button class="crear__boton crear__boton--primario">Guardar cambios</button>
@@ -28,6 +33,12 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
+
+const categorias = ref([
+  { id: 1, nombre: 'Local' },
+  { id: 2, nombre: 'Deportes' },
+  { id: 3, nombre: 'Cultura' }
+])
 
 const form = ref({ titulo:'', resumen:'', contenido:'', imagen:'', id_categoria:'' })
 const mensaje = ref('')
@@ -45,7 +56,7 @@ onMounted(async () => {
   const res = await api.get('/noticias')
   const lista = res.data.noticias || res.data
   const n = lista.find(x => String(x.id_noticia || x.id) === String(route.params.id))
-  if (n) form.value = { titulo: n.titulo, resumen: n.resumen, contenido: n.contenido, imagen: n.imagen || '', id_categoria: n.id_categoria, destacada: !!n.destacada }
+  if (n) form.value = { titulo: n.titulo, resumen: n.resumen, contenido: n.contenido, imagen: n.imagen || '', id_categoria:  Number(n.id_categoria), destacada: !!n.destacada }
 })
 
 async function subirImagen(e) {
