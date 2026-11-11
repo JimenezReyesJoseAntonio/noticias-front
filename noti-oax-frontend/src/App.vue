@@ -7,6 +7,7 @@
         <router-link v-if="!logueado" to="/login" class="navbar__link">Login</router-link>
         <button v-else @click="cerrarSesion" class="navbar__link navbar__link--boton">Cerrar sesión</button>
         <router-link v-if="logueado" to="/crear" class="navbar__link">Crear noticia</router-link>
+        <router-link v-if="esAdmin" to="/usuarios/crear" class="navbar__link">Crear usuario</router-link>
       </nav>
     </header>
 
@@ -24,17 +25,20 @@ import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 const logueado = ref(!!localStorage.getItem('token'))
+const esAdmin = ref(localStorage.getItem('rol') === 'admin')
 const route = useRoute()
 const router = useRouter()
 
-// Cada que cambias de página, revisa si hay token
 watch(() => route.path, () => {
   logueado.value = !!localStorage.getItem('token')
+  esAdmin.value = localStorage.getItem('rol') === 'admin'
 })
 
 function cerrarSesion() {
   localStorage.removeItem('token')
+  localStorage.removeItem('rol')
   logueado.value = false
+  esAdmin.value = false
   router.push('/login')
 }
 </script>

@@ -4,11 +4,13 @@ import LoginView from '../views/LoginView.vue'
 import CrearNoticiaView from '../views/CrearNoticiaView.vue'
 import DetalleNoticiaView from '../views/DetalleNoticiaView.vue'
 import EditarNoticiaView from '../views/EditarNoticiaView.vue'
+import CrearUsuarioView from '../views/CrearUsuarioView.vue'
 
 const routes = [
   { path: '/', component: HomeView },
   { path: '/login', component: LoginView },
   { path: '/crear', component: CrearNoticiaView, meta: { requiereAuth: true } },
+  { path: '/usuarios/crear', component: CrearUsuarioView, meta: { requiereAdmin: true } },
   { path: '/noticia/:id', component: DetalleNoticiaView },
   { path: '/editar/:id', component: EditarNoticiaView, meta: { requiereAuth: true } }
 ]
@@ -17,8 +19,15 @@ const router = createRouter({ history: createWebHistory(), routes })
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  if (to.meta.requiereAuth && !token) next('/login')
-  else next()
+  const rol = localStorage.getItem('rol')
+
+  if ((to.meta.requiereAuth || to.meta.requiereAdmin) && !token) {
+    next('/login')
+  } else if (to.meta.requiereAdmin && rol !== 'admin') {
+    next('/')
+  } else {
+    next()
+  }
 })
 
 export default router

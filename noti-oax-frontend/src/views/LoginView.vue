@@ -40,6 +40,9 @@ async function hacerLogin() {
   try {
     const res = await api.post('/auth/login', { correo: correo.value, password: password.value })
     localStorage.setItem('token', res.data.token)
+    localStorage.removeItem('rol')
+    const rol = res.data.usuario?.rol || res.data.rol
+    if (rol) localStorage.setItem('rol', rol)
     router.push('/')
   } catch (e) {
     error.value = 'Correo o contraseña incorrectos'
