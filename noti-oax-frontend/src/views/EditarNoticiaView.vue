@@ -33,6 +33,7 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
+import { getUrlImagen } from '../services/imagenes'
 
 const categorias = ref([
   { id: 1, nombre: 'Local' },
@@ -45,12 +46,6 @@ const mensaje = ref('')
 const route = useRoute()
 const router = useRouter()
 const subiendo = ref(false)
-
-const getUrlImagen = (url) => {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
-}
 
 onMounted(async () => {
   const res = await api.get('/noticias')

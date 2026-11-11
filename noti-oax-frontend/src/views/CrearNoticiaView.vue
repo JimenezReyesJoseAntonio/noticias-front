@@ -40,6 +40,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '../services/api'
+import { getUrlImagen } from '../services/imagenes'
 
 const categorias = ref([
   { id: 1, nombre: 'Local' },
@@ -51,12 +52,6 @@ const mensaje = ref('')
 const error = ref('')
 const router = useRouter()
 const subiendo = ref(false)
-
-const getUrlImagen = (url) => {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
-}
 
 async function subirImagen(e) {
   const file = e.target.files[0]

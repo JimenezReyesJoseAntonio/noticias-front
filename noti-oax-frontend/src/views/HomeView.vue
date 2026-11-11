@@ -81,6 +81,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import api from '../services/api'
+import { getUrlImagen } from '../services/imagenes'
 
 const noticias = ref([])
 const cargando = ref(true)
@@ -144,12 +145,6 @@ const noticiasFiltradas = computed(() => {
   if (categoriaActiva.value === 'Todas') return noticias.value
   return noticias.value.filter(n => n.nombre_categoria === categoriaActiva.value)
 });
-
-const getUrlImagen = (url) => {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
-}
 
 </script>
 

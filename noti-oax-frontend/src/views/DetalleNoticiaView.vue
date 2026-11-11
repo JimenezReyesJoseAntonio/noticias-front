@@ -19,17 +19,12 @@
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '../services/api'
+import { getUrlImagen } from '../services/imagenes'
 
 const noticia = ref(null)
 const route = useRoute()
 const router = useRouter()
 const logueado = ref(!!localStorage.getItem('token'))
-
-const getUrlImagen = (url) => {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return `http://localhost:3000${url}`
-}
 
 onMounted(async () => {
   try {
